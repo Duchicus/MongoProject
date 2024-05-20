@@ -146,7 +146,7 @@ module.exports = {
                 ApiKeyAuth: []
             }],
             tags: {
-                Posts: "Logout",
+                Users: "Logout",
             },
             description: "Logout",
             operationId: "Logout",
