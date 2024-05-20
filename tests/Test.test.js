@@ -7,6 +7,7 @@ const Comment = require("../models/Comment.js")
 require("dotenv").config();
 const { JWT_SECRET } = process.env
 let token
+let token2
 let postId
 let userId
 let userId2
@@ -25,7 +26,7 @@ describe("testing", () => {
     };
     const user2 = {
         name: "memeo2",
-        email: "mpiernash2@gmail.com",
+        email: "mpiernash3@gmail.com",
         password: "123456",
     };
     const post = {
@@ -113,8 +114,24 @@ describe("testing", () => {
             .send(user2)
             .expect(201);
         expect(res.body.message).toBeDefined();
-        userId2 = res.body.user._id
     })
+    test("Confirm a user", async () => {
+        const emailToken = jwt.sign({ email: user2.email }, JWT_SECRET, {
+            expiresIn: "48h",
+        });
+        const res = await request(app)
+            .get("/users/confirm/" + emailToken)
+            .expect(201);
+        expect(res.body.message).toBe("User confirmed");
+    });
+    test("Login a user", async () => {
+        const res = await request(app)
+            .post("/users/login")
+            .send(user2)
+            .expect(200);
+        userId2 = res.body.user._id
+        console.warn(userId2)
+    });
     test("Follow", async () => {
         const res = await request(app)
             .put("/users/follow/" + userId2)
@@ -128,5 +145,5 @@ describe("testing", () => {
             .expect(200)
             .set({ Authorization: token })
         expect(res.body.message).toBe("User unfollowed")
-    });
+    }); 
 })
