@@ -21,8 +21,11 @@ const UserController = {
       } else {
         return res.status(400).send("User already exists")
       }
+
       const emailToken = jwt.sign({ email: req.body.email }, JWT_SECRET, { expiresIn: '48h' })
+
       const url = EMAILURL + '/users/confirm/' + emailToken
+
       await transporter.sendMail({
         to: req.body.email,
         subject: "Confirm your email",
@@ -30,6 +33,7 @@ const UserController = {
         <a href="${url}"> Click your email to confirm your registration</a>
         `,
       });
+
       res.status(201).send({
         message: "Welcome, you are one step away from registering, check your email to confirm your registration"
       });
@@ -65,7 +69,7 @@ const UserController = {
       if (user.tokens.length > 4) user.tokens.shift();
       user.tokens.push(token);
       await user.save();
-      res.status(200).send({ message: 'Welcome ' + user.email, token, user});
+      res.status(200).send({ message: 'Welcome ' + user.email, token, user });
     } catch (error) {
       next(error)
     }
@@ -85,10 +89,10 @@ const UserController = {
   },
   async loged(req, res) {
     try {
-      const users = await User.findOne({ email: req.user.email, })
+      const user = await User.findOne({ email: req.user.email, })
         .populate('commentsId', 'text')
-        .populate('postsId', 'text')
-      res.send(users)
+        .populate('postsId', 'text image')
+      res.send(user)
     } catch (error) {
       console.error(error);
       res.status(500).send({
@@ -99,6 +103,8 @@ const UserController = {
   async getByName(req, res) {
     try {
       const users = await User.findOne({ name: req.params.name, })
+      .populate('commentsId', 'text')
+      .populate('postsId', 'text')
       if (!users) {
         return res.status(400).send("User not found")
       }
@@ -136,7 +142,7 @@ const UserController = {
       }
       const user = await User.findByIdAndUpdate(req.user._id, { $push: { following: req.params.id } })
       await User.findByIdAndUpdate(req.params.id, { $push: { followers: req.user._id } })
-      res.send({message:"User followed", user})
+      res.send({ message: "User followed", user })
     } catch (error) {
       console.error(error);
       res.status(500).send({
@@ -154,7 +160,7 @@ const UserController = {
       }
       const user = await User.findByIdAndUpdate(req.user._id, { $pull: { following: req.params.id } })
       await User.findByIdAndUpdate(req.params.id, { $pull: { followers: req.user._id } })
-      res.send({message:"User unfollowed", user})
+      res.send({ message: "User unfollowed", user })
     } catch (error) {
       console.error(error);
       res.status(500).send({
