@@ -38,6 +38,14 @@ const PostController = {
     async getById(req, res) {
         try {
             const post = await Post.findOne({ _id: req.params.id, })
+                .populate({
+                    path: 'commentsId',
+                    select: 'userId _id text',
+                    populate: {
+                        path: 'userId',
+                        select: 'name email profilePic'  // Selecciona los campos que desees de User
+                    }
+                });
             if (!post) {
                 return res.status(400).send("Post not found")
             }
@@ -74,9 +82,9 @@ const PostController = {
     async like(req, res) {
         try {
             const revise = await Post.findOne(
-                { 
+                {
                     _id: req.params.id,
-                    likes: req.user._id 
+                    likes: req.user._id
                 }
             )
             if (!revise) {
@@ -85,7 +93,7 @@ const PostController = {
                     { $push: { likes: req.user._id } },
                     { new: true }
                 ).populate('userId', 'name profilePic');
-                res.status(200).send({message:"Like succesfully added", post});
+                res.status(200).send({ message: "Like succesfully added", post });
             } else {
                 return res.status(400).send({ message: "You already like this post" })
             }
@@ -97,8 +105,8 @@ const PostController = {
     async dislike(req, res) {
         try {
             const revise = await Post.findOne(
-                { 
-                    likes: req.user._id 
+                {
+                    likes: req.user._id
                 }
             )
             if (revise) {
@@ -107,7 +115,7 @@ const PostController = {
                     { $pull: { likes: req.user._id } },
                     { new: true }
                 ).populate('userId', 'name profilePic');
-                res.send({message:"Dislike succesfully added", post});
+                res.send({ message: "Dislike succesfully added", post });
             } else {
                 return res.status(400).send({ message: "You already dislike thit post" })
             }
