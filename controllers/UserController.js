@@ -104,7 +104,7 @@ const UserController = {
     try {
       const users = await User.findOne({ name: req.params.name, })
       .populate('commentsId', 'text')
-      .populate('postsId', 'text')
+      .populate('postsId', 'text image')
       if (!users) {
         return res.status(400).send("User not found")
       }

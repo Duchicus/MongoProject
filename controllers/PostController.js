@@ -84,7 +84,7 @@ const PostController = {
                     req.params.id,
                     { $push: { likes: req.user._id } },
                     { new: true }
-                ).populate('userId', 'name');
+                ).populate('userId', 'name profilePic');
                 res.status(200).send({message:"Like succesfully added", post});
             } else {
                 return res.status(400).send({ message: "You already like this post" })
@@ -106,7 +106,7 @@ const PostController = {
                     req.params.id,
                     { $pull: { likes: req.user._id } },
                     { new: true }
-                ).populate('userId', 'name');
+                ).populate('userId', 'name profilePic');
                 res.send({message:"Dislike succesfully added", post});
             } else {
                 return res.status(400).send({ message: "You already dislike thit post" })
