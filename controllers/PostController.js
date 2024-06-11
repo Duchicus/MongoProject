@@ -39,8 +39,11 @@ const PostController = {
         try {
             const post = await Post.findOne({ _id: req.params.id, })
                 .populate({
-                    path: 'commentsId', select: 'userId _id text', populate: {
-                        path: 'userId', select: 'name email profilePic'
+                    path: 'commentsId',
+                    select: 'userId _id text',
+                    populate: {
+                        path: 'userId',
+                        select: 'name email profilePic'  // Selecciona los campos que desees de User
                     }
                 });
             if (!post) {
