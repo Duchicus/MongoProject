@@ -20,7 +20,7 @@ const CommentsController = {
   async delete(req, res) {
     try {
       const comment = await Comment.findOneAndDelete({ _id: req.params.id });
-      res.status(201).send(comment);
+      res.status(201).send({message: "Comment delete", comment});
     } catch (error) {
       console.error(error);
     }
@@ -28,6 +28,7 @@ const CommentsController = {
   async update(req, res) {
     try {
       const comment = await Comment.findOneAndUpdate({ _id: req.params.id }, { $set: { text: req.body.text } });
+      console.log(req.body);
       res.status(201).send(comment);
 
     } catch (error) {
