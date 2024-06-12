@@ -14,12 +14,12 @@ const PostController = {
                 userId: req.user._id,
             });
             await post.save();
-            await User.findByIdAndUpdate(req.user._id, { $push: { postsId: post._id } })
+            await User.findByIdAndUpdate(req.user._id, { $push: { postsId: post._id } });
 
             res.status(201).json({ message: "Post created", post });
 
         } catch (error) {
-            next(error)
+            next(error);
         }
     },
     async getAllPostWithUsersAndComments(req, res) {
@@ -28,7 +28,7 @@ const PostController = {
             const posts = await Post.find()
                 // .limit(limit) .skip((page - 1) * limit)
                 .populate('userId', 'name profilePic')
-                .populate('commentsId', 'userId text')
+                .populate('commentsId', 'userId text');
             res.send(posts);
         } catch (error) {
             console.error(error);
@@ -37,7 +37,7 @@ const PostController = {
     },
     async getById(req, res) {
         try {
-            const post = await Post.findOne({ _id: req.params.id, })
+            const post = await Post.findOne({ _id: req.params.id })
                 .populate({
                     path: 'commentsId',
                     select: 'userId _id text',
@@ -47,7 +47,7 @@ const PostController = {
                     }
                 });
             if (!post) {
-                return res.status(400).send("Post not found")
+                return res.status(400).send("Post not found");
             }
             res.send(post);
         } catch (error) {
@@ -57,9 +57,9 @@ const PostController = {
     },
     async getByText(req, res) {
         try {
-            const post = await Post.findOne({ text: req.params.text, })
+            const post = await Post.findOne({ text: req.params.text });
             if (!post) {
-                return res.status(400).send("Post not found")
+                return res.status(400).send("Post not found");
             }
             res.send(post);
         } catch (error) {
@@ -71,7 +71,7 @@ const PostController = {
         try {
             const post = await Post.findOneAndDelete({ _id: req.params.id });
             if (!post) {
-                return res.status(400).send("Post not found")
+                return res.status(400).send("Post not found");
             }
             res.send(post);
         } catch (error) {
@@ -79,49 +79,57 @@ const PostController = {
             res.status(500).json({ message: "Error when deleting a post" });
         }
     },
+    async deleteAsAdmin(req, res) {
+        try {
+            const post = await Post.findOneAndDelete({ _id: req.params.id });
+            if (!post) {
+                return res.status(400).send("Post not found");
+            }
+            res.send(post);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Error when deleting a post as admin" });
+        }
+    },
     async like(req, res) {
         try {
-            const revise = await Post.findOne(
-                {
-                    _id: req.params.id,
-                    likes: req.user._id
-                }
-            )
+            const revise = await Post.findOne({
+                _id: req.params.id,
+                likes: req.user._id
+            });
             if (!revise) {
                 const post = await Post.findByIdAndUpdate(
                     req.params.id,
                     { $push: { likes: req.user._id } },
                     { new: true }
                 ).populate('userId', 'name profilePic');
-                res.status(200).send({ message: "Like succesfully added", post });
+                res.status(200).send({ message: "Like successfully added", post });
             } else {
-                return res.status(400).send({ message: "You already like this post" })
+                return res.status(400).send({ message: "You already like this post" });
             }
         } catch (error) {
             console.error(error);
-            res.status(500).send({ message: "There are a problem with your like" });
+            res.status(500).send({ message: "There is a problem with your like" });
         }
     },
     async dislike(req, res) {
         try {
-            const revise = await Post.findOne(
-                {
-                    likes: req.user._id
-                }
-            )
+            const revise = await Post.findOne({
+                likes: req.user._id
+            });
             if (revise) {
                 const post = await Post.findByIdAndUpdate(
                     req.params.id,
                     { $pull: { likes: req.user._id } },
                     { new: true }
                 ).populate('userId', 'name profilePic');
-                res.send({ message: "Dislike succesfully added", post });
+                res.send({ message: "Dislike successfully added", post });
             } else {
-                return res.status(400).send({ message: "You already dislike thit post" })
+                return res.status(400).send({ message: "You already dislike this post" });
             }
         } catch (error) {
             console.error(error);
-            res.status(500).send({ message: "There are a problem with your dislike" });
+            res.status(500).send({ message: "There is a problem with your dislike" });
         }
     },
 };
