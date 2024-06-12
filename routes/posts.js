@@ -8,7 +8,7 @@ router.post('/',authentication, uploadPostImage.single("image"), PostController.
 router.get('/', PostController.getAllPostWithUsersAndComments)
 router.get('/id/:id',PostController.getById)
 router.get('/text/:text',PostController.getByText)
-router.delete('/:id',authentication, isAuthorPost, isAdmin, PostController.delete)
+router.delete('/:id',authentication, isAuthorPost,PostController.delete)
 router.put('/like/:id',authentication,PostController.like)
 router.put('/dislike/:id',authentication,PostController.dislike)
 router.delete('/posts/admin/:id', authentication, isAdmin, PostController.deleteAsAdmin);
