@@ -4,6 +4,7 @@ const router = express.Router()
 const { authentication, isAuthorPost, isAdmin } = require('../middleware/authentication.js')
 const { uploadPostImage } = require('../middleware/multer.js')
 
+router.delete('/admin/:id', authentication, isAdmin, PostController.deleteAsAdmin);
 router.post('/',authentication, uploadPostImage.single("image"), PostController.create)
 router.get('/', PostController.getAllPostWithUsersAndComments)
 router.get('/id/:id',PostController.getById)
@@ -11,7 +12,7 @@ router.get('/text/:text',PostController.getByText)
 router.delete('/:id',authentication, isAuthorPost,PostController.delete)
 router.put('/like/:id',authentication,PostController.like)
 router.put('/dislike/:id',authentication,PostController.dislike)
-router.delete('/posts/admin/:id', authentication, isAdmin, PostController.deleteAsAdmin);
+
 
 module.exports = router
 
